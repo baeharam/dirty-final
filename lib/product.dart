@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Product {
   String creator;
+  DateTime createdTime;
+  DateTime modifedTime;
   String image;
   String name;
   String category;
@@ -19,5 +21,7 @@ class Product {
     information = snapshot.data['information'];
     documentID = snapshot.documentID;
     creator = snapshot.data['creator'];
+    createdTime = snapshot.data['created'];
+    modifedTime = snapshot.data['modified'];
   }
 }

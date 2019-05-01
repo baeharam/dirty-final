@@ -1,5 +1,5 @@
+import 'package:classwork/add.dart';
 import 'package:classwork/detail.dart';
-import 'package:classwork/global.dart';
 import 'package:classwork/product.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -24,7 +24,8 @@ class _ItemState extends State<Item> {
           icon: Icon(Icons.person),
           onPressed: (){},
         ),
-        actions: [IconButton(icon: Icon(Icons.add), onPressed: (){})],
+        actions: [IconButton(icon: Icon(Icons.add), onPressed: () =>
+          Navigator.of(context).push(MaterialPageRoute(builder: (_) => Add())))],
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _firestore.collection('products').snapshots(),

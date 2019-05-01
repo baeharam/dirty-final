@@ -99,6 +99,11 @@ class _DetailState extends State<Detail> {
                   fontSize: 20.0,
                   fontWeight: FontWeight.bold
                 )
+              ),
+              Text(
+                'Creator: ${product.creator}\n'
+                'Created time: ${product.createdTime}\n'
+                'Modified time: ${product.modifedTime}\n'
               )
             ],
           );
