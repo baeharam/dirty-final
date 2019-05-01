@@ -3,6 +3,8 @@ import 'package:classwork/product.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import 'global.dart';
+
 class Detail extends StatefulWidget {
 
   final String documentID;
@@ -18,6 +20,12 @@ class _DetailState extends State<Detail> {
   bool _isFetched = false;
   Product _product = Product();
 
+  Future<void> _delete() async {
+    await Firestore.instance.collection('products')
+    .document(widget.documentID)
+    .delete();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,13 +34,22 @@ class _DetailState extends State<Detail> {
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.edit),
-            onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-              builder: (_) => _isFetched ? Edit(product: _product) : null
-            )),
+            onPressed: (){ 
+              if(_isFetched && _product.creator==Global.currentUser.uid){
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (_) => Edit(product: _product)
+                ));
+              }
+            },
           ),
           IconButton(
             icon: Icon(Icons.delete),
-            onPressed: (){},
+            onPressed: () async {
+              if(_isFetched && _product.creator==Global.currentUser.uid){
+                await _delete();
+                Navigator.pop(context);
+              }
+            },
           )
         ],
       ),
