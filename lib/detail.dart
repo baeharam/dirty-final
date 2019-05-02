@@ -149,6 +149,25 @@ class _DetailState extends State<Detail> {
                             .collection('up').document(Global.currentUser.uid).setData({
                               'flag': true
                             });
+                          _scaffoldKey.currentState.showSnackBar(SnackBar(
+                            duration: const Duration(milliseconds: 1000),
+                            content: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: <Widget>[
+                                Text('I like it!!'),
+                                FlatButton(
+                                  child: Text('Undo'),
+                                  onPressed: () async {
+                                    await Firestore.instance.collection('products')
+                                      .document(product.documentID)
+                                      .collection('up')
+                                      .document(Global.currentUser.uid)
+                                      .updateData({'flag': false});
+                                  },
+                                )
+                              ],
+                            ),
+                          ));
                         }
                       },
                     ),

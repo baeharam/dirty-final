@@ -16,28 +16,12 @@ class _ItemState extends State<Item> {
   final Firestore _firestore = Firestore.instance;
   bool _isFetched = false;
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Main'),
-        centerTitle: true,
-        leading: IconButton(
-          icon: Icon(Icons.person),
-          onPressed: () => _isFetched ? Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => Profile())) : null,
-        ),
-        actions: [IconButton(icon: Icon(Icons.add), onPressed: () =>
-          Navigator.of(context).push(MaterialPageRoute(builder: (_) => Add())))],
-      ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: _firestore.collection('products').snapshots(),
-        builder: (context, snapshot){
-          if(snapshot.hasData && snapshot.data.documents.isNotEmpty) {
-            _isFetched = true;
-            var productList = snapshot.data.documents.map((snapshot)
-              => Product.fromSnapshot(snapshot)).toList();
-            return GridView.builder(
+  String _category = 'All';
+  bool _isDescending = false;
+  
+
+  Widget _buildGridView(List<Product> productList) {
+    return GridView.builder(
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
               itemCount: productList.length,
               itemBuilder: (_,index){
@@ -69,9 +53,85 @@ class _ItemState extends State<Item> {
                 );
               }
             );
-          }
-          return Container();
-        }
+  }
+
+  Stream<QuerySnapshot> _getStream() {
+    return _category=='All' ?
+      _firestore.collection('products')
+      .orderBy('price',descending: _isDescending)
+      .snapshots()
+    : _firestore.collection('products')
+      .where('category',isEqualTo: _category)
+      .orderBy('price',descending: _isDescending)
+      .snapshots();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Main'),
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.person),
+          onPressed: () => _isFetched ? Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => Profile())) : null,
+        ),
+        actions: [IconButton(icon: Icon(Icons.add), onPressed: () =>
+          Navigator.of(context).push(MaterialPageRoute(builder: (_) => Add())))],
+      ),
+      body: Column(
+        children: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              DropdownButton<String>(
+                value: _category,
+                items: <String>['All','pretty','beautiful','cute'].map((val){
+                  return DropdownMenuItem(
+                    value: val,
+                    child: Text(val),
+                  );
+                }).toList(),
+                onChanged: (val){
+                  setState(() {
+                    _category = val;
+                  });
+                },
+              ),
+              SizedBox(width: 10.0),
+              DropdownButton<String>(
+                value: _isDescending?'DESC':'ASC',
+                items: <String>['ASC','DESC'].map((val){
+                  return DropdownMenuItem(
+                    value: val,
+                    child: Text(val),
+                  );
+                }).toList(),
+                onChanged: (val){
+                  setState(() {
+                    _isDescending = val=='ASC'?false:true;
+                  });
+                },
+              )
+            ],
+          ),
+          Expanded(
+            child: StreamBuilder<QuerySnapshot>(
+              stream: _getStream(),
+              builder: (context, snapshot){
+                if(snapshot.hasData && snapshot.data.documents.isNotEmpty) {
+                  _isFetched = true;
+                  var productList = snapshot.data.documents.map((snapshot)
+                    => Product.fromSnapshot(snapshot)).toList();
+                  return _buildGridView(productList);
+                }
+                return Container();
+              }
+            ),
+          ),
+        ],
       ),
     );
   }
