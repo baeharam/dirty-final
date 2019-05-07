@@ -36,7 +36,7 @@ class _DetailState extends State<Detail> {
         title: Text('Detail'),
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.edit),
+            icon: Icon(Icons.create),
             onPressed: (){ 
               if(_isFetched && _product.creator==Global.currentUser.uid){
                 Navigator.of(context).push(MaterialPageRoute(
