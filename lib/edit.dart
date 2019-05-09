@@ -60,7 +60,7 @@ class _EditState extends State<Edit> {
     String imageUrl = _isFirst ? widget.product.image :
      await _uploadImageGetUrl(_image, nameController.text);
     await Firestore.instance.collection('products')
-      .document(widget.product.name)
+      .document(widget.product.documentID)
       .updateData({
         'name': nameController.text,
         'category': categoryController.text,
